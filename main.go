@@ -13,7 +13,10 @@ var (
 	WalkDownAction  *common.Animation
 	WalkLeftAction  *common.Animation
 	WalkRightAction *common.Animation
-	StopAction      *common.Animation
+	StopUpAction    *common.Animation
+	StopDownAction  *common.Animation
+	StopLeftAction  *common.Animation
+	StopRightAction *common.Animation
 	SkillAction     *common.Animation
 	actions         []*common.Animation
 
@@ -45,9 +48,24 @@ func (*DefaultScene) Preload() {
 
 	engo.Files.Load(model)
 
-	StopAction = &common.Animation{
-		Name:   "stop",
+	StopUpAction = &common.Animation{
+		Name:   "upstop",
+		Frames: []int{37},
+	}
+
+	StopDownAction = &common.Animation{
+		Name:   "downstop",
 		Frames: []int{1},
+	}
+
+	StopLeftAction = &common.Animation{
+		Name:   "leftstop",
+		Frames: []int{13},
+	}
+
+	StopRightAction = &common.Animation{
+		Name:   "rightstop",
+		Frames: []int{25},
 	}
 
 	WalkUpAction = &common.Animation{
@@ -75,7 +93,10 @@ func (*DefaultScene) Preload() {
 	}
 
 	actions = []*common.Animation{
-		StopAction,
+		StopUpAction,
+		StopDownAction,
+		StopLeftAction,
+		StopRightAction,
 		WalkUpAction,
 		WalkDownAction,
 		WalkLeftAction,
@@ -137,7 +158,8 @@ func (*DefaultScene) CreateEntity(point engo.Point, spriteSheet *common.Spritesh
 	entity.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
 
 	entity.AnimationComponent.AddAnimations(actions)
-	entity.AnimationComponent.AddDefaultAnimation(StopAction)
+	entity.AnimationComponent.SelectAnimationByName("downstop")
+	// entity.AnimationComponent.AddDefaultAnimation(StopDownAction)
 
 	return entity
 }
@@ -181,6 +203,16 @@ func (c *ControlSystem) Update(dt float32) {
 			e.AnimationComponent.SelectAnimationByAction(WalkLeftAction)
 		} else if engo.Input.Button(rightButton).JustPressed() {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
+		}
+
+		if engo.Input.Button(upButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopUpAction)
+		} else if engo.Input.Button(downButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopDownAction)
+		} else if engo.Input.Button(leftButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopLeftAction)
+		} else if engo.Input.Button(rightButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopRightAction)
 		}
 
 		speed := engo.GameWidth()*dt - 15
