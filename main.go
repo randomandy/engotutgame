@@ -183,6 +183,16 @@ func (c *ControlSystem) Update(dt float32) {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
 		}
 
+		if engo.Input.Button(upButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopAction)
+		} else if engo.Input.Button(downButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopAction)
+		} else if engo.Input.Button(leftButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopAction)
+		} else if engo.Input.Button(rightButton).JustReleased() {
+			e.AnimationComponent.SelectAnimationByAction(StopAction)
+		}
+
 		speed := engo.GameWidth()*dt - 15
 
 		vert := engo.Input.Axis(e.ControlComponent.SchemeVert)
