@@ -23,7 +23,7 @@ var (
 	rightButton = "right"
 	model       = "motw.png"
 	width       = 52
-	height      = 72
+	height      = 73
 )
 
 type DefaultScene struct{}
@@ -33,17 +33,46 @@ type Animation struct {
 	common.AnimationComponent
 	common.RenderComponent
 	common.SpaceComponent
+	ControlComponent
+}
+
+type ControlComponent struct {
+	SchemeVert  string
+	SchemeHoriz string
 }
 
 func (*DefaultScene) Preload() {
 
 	engo.Files.Load(model)
 
-	StopAction = &common.Animation{Name: "stop", Frames: []int{1}}
-	WalkUpAction = &common.Animation{Name: "up", Frames: []int{36, 37, 38}, Loop: true}
-	WalkDownAction = &common.Animation{Name: "down", Frames: []int{0, 1, 2}, Loop: true}
-	WalkLeftAction = &common.Animation{Name: "left", Frames: []int{12, 13, 14}, Loop: true}
-	WalkRightAction = &common.Animation{Name: "right", Frames: []int{24, 25, 26}, Loop: true}
+	StopAction = &common.Animation{
+		Name:   "stop",
+		Frames: []int{1},
+	}
+
+	WalkUpAction = &common.Animation{
+		Name:   "up",
+		Frames: []int{36, 37, 38},
+		Loop:   true,
+	}
+
+	WalkDownAction = &common.Animation{
+		Name:   "down",
+		Frames: []int{0, 1, 2},
+		Loop:   true,
+	}
+
+	WalkLeftAction = &common.Animation{
+		Name:   "left",
+		Frames: []int{12, 13, 14},
+		Loop:   true,
+	}
+
+	WalkRightAction = &common.Animation{
+		Name:   "right",
+		Frames: []int{24, 25, 26},
+		Loop:   true,
+	}
 
 	actions = []*common.Animation{
 		StopAction,
@@ -66,9 +95,17 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(&ControlSystem{})
 
+	engo.Input.RegisterAxis("vertical", engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown})
+	engo.Input.RegisterAxis("horizontal", engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight})
+
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
 	hero := scene.CreateEntity(engo.Point{0, 0}, spriteSheet)
+
+	hero.ControlComponent = ControlComponent{
+		SchemeHoriz: "horizontal",
+		SchemeVert:  "vertical",
+	}
 
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
@@ -78,7 +115,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 		case *common.AnimationSystem:
 			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.RenderComponent)
 		case *ControlSystem:
-			sys.Add(&hero.BasicEntity, &hero.AnimationComponent)
+			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.ControlComponent, &hero.SpaceComponent)
 		}
 	}
 }
@@ -95,7 +132,7 @@ func (*DefaultScene) CreateEntity(point engo.Point, spriteSheet *common.Spritesh
 	}
 	entity.RenderComponent = common.RenderComponent{
 		Drawable: spriteSheet.Cell(0),
-		Scale:    engo.Point{3, 3},
+		Scale:    engo.Point{1, 1},
 	}
 	entity.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
 
@@ -108,14 +145,16 @@ func (*DefaultScene) CreateEntity(point engo.Point, spriteSheet *common.Spritesh
 type controlEntity struct {
 	*ecs.BasicEntity
 	*common.AnimationComponent
+	*ControlComponent
+	*common.SpaceComponent
 }
 
 type ControlSystem struct {
 	entities []controlEntity
 }
 
-func (c *ControlSystem) Add(basic *ecs.BasicEntity, anim *common.AnimationComponent) {
-	c.entities = append(c.entities, controlEntity{basic, anim})
+func (c *ControlSystem) Add(basic *ecs.BasicEntity, anim *common.AnimationComponent, control *ControlComponent, space *common.SpaceComponent) {
+	c.entities = append(c.entities, controlEntity{basic, anim, control, space})
 }
 
 func (c *ControlSystem) Remove(basic ecs.BasicEntity) {
@@ -143,12 +182,33 @@ func (c *ControlSystem) Update(dt float32) {
 		} else if engo.Input.Button(rightButton).JustPressed() {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
 		}
+
+		speed := engo.GameWidth()*dt - 15
+
+		vert := engo.Input.Axis(e.ControlComponent.SchemeVert)
+		e.SpaceComponent.Position.Y += speed * vert.Value()
+
+		horiz := engo.Input.Axis(e.ControlComponent.SchemeHoriz)
+		e.SpaceComponent.Position.X += speed * horiz.Value()
+
+		if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
+			e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
+		} else if e.SpaceComponent.Position.Y < 0 {
+			e.SpaceComponent.Position.Y = 0
+		}
+
+		if (e.SpaceComponent.Width + e.SpaceComponent.Position.X) > engo.GameWidth() {
+			e.SpaceComponent.Position.X = engo.GameWidth() - e.SpaceComponent.Width
+		} else if e.SpaceComponent.Position.X < 0 {
+			e.SpaceComponent.Position.X = 0
+		}
+
 	}
 }
 
 func main() {
 	opts := engo.RunOptions{
-		Title:  "Animation Demo",
+		Title:  "Ivo",
 		Width:  1024,
 		Height: 640,
 	}
