@@ -39,9 +39,6 @@ type Animation struct {
 type ControlComponent struct {
 	SchemeVert  string
 	SchemeHoriz string
-
-	// oldY is (optionally) the old Y-location of the mouse / touch - used to determine drag direction
-	oldY float32
 }
 
 func (*DefaultScene) Preload() {
@@ -211,7 +208,7 @@ func (c *ControlSystem) Update(dt float32) {
 
 func main() {
 	opts := engo.RunOptions{
-		Title:  "Animation Demo",
+		Title:  "Ivo",
 		Width:  1024,
 		Height: 640,
 	}
