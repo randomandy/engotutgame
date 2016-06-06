@@ -37,7 +37,8 @@ type Animation struct {
 }
 
 type ControlComponent struct {
-	Scheme string
+	SchemeVert  string
+	SchemeHoriz string
 
 	// oldY is (optionally) the old Y-location of the mouse / touch - used to determine drag direction
 	oldY float32
@@ -97,16 +98,17 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(&ControlSystem{})
 
-	engo.Input.RegisterAxis("wasd", engo.AxisKeyPair{engo.W, engo.S})
-	engo.Input.RegisterAxis("arrowsupdown", engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown})
-	engo.Input.RegisterAxis("arrowsleftright", engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight})
-	schemes := []string{"wasd", "arrowsupdown", "arrowsleftright"}
+	engo.Input.RegisterAxis("vertical", engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown})
+	engo.Input.RegisterAxis("horizontal", engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight})
 
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
 	hero := scene.CreateEntity(engo.Point{0, 0}, spriteSheet)
 
-	hero.ControlComponent = ControlComponent{Scheme: schemes[1]}
+	hero.ControlComponent = ControlComponent{
+		SchemeHoriz: "horizontal",
+		SchemeVert:  "vertical",
+	}
 
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
@@ -184,15 +186,24 @@ func (c *ControlSystem) Update(dt float32) {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
 		}
 
-		speed := engo.GameWidth() * dt
+		speed := engo.GameWidth()*dt - 15
 
-		vert := engo.Input.Axis(e.ControlComponent.Scheme)
+		vert := engo.Input.Axis(e.ControlComponent.SchemeVert)
 		e.SpaceComponent.Position.Y += speed * vert.Value()
+
+		horiz := engo.Input.Axis(e.ControlComponent.SchemeHoriz)
+		e.SpaceComponent.Position.X += speed * horiz.Value()
 
 		if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
 			e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
 		} else if e.SpaceComponent.Position.Y < 0 {
 			e.SpaceComponent.Position.Y = 0
+		}
+
+		if (e.SpaceComponent.Width + e.SpaceComponent.Position.X) > engo.GameWidth() {
+			e.SpaceComponent.Position.X = engo.GameWidth() - e.SpaceComponent.Width
+		} else if e.SpaceComponent.Position.X < 0 {
+			e.SpaceComponent.Position.X = 0
 		}
 
 	}
