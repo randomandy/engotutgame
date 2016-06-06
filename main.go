@@ -23,7 +23,7 @@ var (
 	rightButton = "right"
 	model       = "motw.png"
 	width       = 52
-	height      = 72
+	height      = 73
 )
 
 type DefaultScene struct{}
