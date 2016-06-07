@@ -27,11 +27,13 @@ var (
 	model       = "motw.png"
 	width       = 52
 	height      = 73
+	levelWidth  float32
+	levelHeight float32
 )
 
 type DefaultScene struct{}
 
-type Animation struct {
+type Hero struct {
 	ecs.BasicEntity
 	common.AnimationComponent
 	common.RenderComponent
@@ -44,9 +46,22 @@ type ControlComponent struct {
 	SchemeHoriz string
 }
 
+type Tile struct {
+	ecs.BasicEntity
+	common.RenderComponent
+	common.SpaceComponent
+	common.CollisionComponent
+}
+
 func (*DefaultScene) Preload() {
 
+	// Load character model
 	engo.Files.Load(model)
+
+	// Load TileMap
+	if err := engo.Files.Load("example.tmx"); err != nil {
+		panic(err)
+	}
 
 	StopUpAction = &common.Animation{
 		Name:   "upstop",
@@ -116,52 +131,151 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(&ControlSystem{})
 
-	engo.Input.RegisterAxis("vertical", engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown})
-	engo.Input.RegisterAxis("horizontal", engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight})
+	// Setup TileMap
+	resource, err := engo.Files.Resource("example.tmx")
+	if err != nil {
+		panic(err)
+	}
+	tmxResource := resource.(common.TMXResource)
+	levelData := tmxResource.Level
+
+	// Extract Map Size
+	levelWidth = levelData.Bounds().Max.X
+	levelHeight = levelData.Bounds().Max.Y
+
+	// Create render and space components for each of the tiles
+	tileComponents := make([]*Tile, 0)
+	for _, v := range levelData.Tiles {
+		if v.Image != nil {
+			tile := &Tile{BasicEntity: ecs.NewBasic()}
+			tile.RenderComponent = common.RenderComponent{
+				Drawable: v,
+				Scale:    engo.Point{1, 1},
+			}
+			tile.SpaceComponent = common.SpaceComponent{
+				Position: v.Point,
+				Width:    0,
+				Height:   0,
+			}
+			tileComponents = append(tileComponents, tile)
+		}
+	}
+	// Do the same the levels images
+	for _, v := range levelData.Images {
+		if v.Image != nil {
+			tile := &Tile{BasicEntity: ecs.NewBasic()}
+			tile.RenderComponent = common.RenderComponent{
+				Drawable: v,
+				Scale:    engo.Point{1, 1},
+			}
+
+			tile.RenderComponent.SetZIndex(2)
+
+			tile.SpaceComponent = common.SpaceComponent{
+				Position: v.Point,
+				Width:    0,
+				Height:   0,
+			}
+
+			tile.CollisionComponent = common.CollisionComponent{
+				Solid: true,
+				Main:  true,
+			}
+
+			tileComponents = append(tileComponents, tile)
+		}
+	}
+
+	// Add each of the tiles entities and its components to the render system
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *common.RenderSystem:
+			for _, v := range tileComponents {
+				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
+			}
+
+		}
+	}
+
+	// Setup character and movement
+	engo.Input.RegisterAxis(
+		"vertical",
+		engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown},
+	)
+
+	engo.Input.RegisterAxis(
+		"horizontal",
+		engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight},
+	)
 
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
-	hero := scene.CreateEntity(engo.Point{0, 0}, spriteSheet)
+	hero := scene.CreateHero(
+		engo.Point{engo.CanvasWidth() / 2, engo.CanvasHeight() / 2},
+		spriteSheet,
+	)
 
 	hero.ControlComponent = ControlComponent{
 		SchemeHoriz: "horizontal",
 		SchemeVert:  "vertical",
 	}
 
+	hero.RenderComponent.SetZIndex(1)
+
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *common.RenderSystem:
-			sys.Add(&hero.BasicEntity, &hero.RenderComponent, &hero.SpaceComponent)
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.RenderComponent,
+				&hero.SpaceComponent,
+			)
+
 		case *common.AnimationSystem:
-			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.RenderComponent)
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.AnimationComponent,
+				&hero.RenderComponent,
+			)
+
 		case *ControlSystem:
-			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.ControlComponent, &hero.SpaceComponent)
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.AnimationComponent,
+				&hero.ControlComponent,
+				&hero.SpaceComponent,
+			)
 		}
 	}
+
+	// Add EntityScroller System
+	w.AddSystem(&common.EntityScroller{
+		SpaceComponent: &hero.SpaceComponent,
+		TrackingBounds: levelData.Bounds(),
+	})
 }
 
 func (*DefaultScene) Type() string { return "GameWorld" }
 
-func (*DefaultScene) CreateEntity(point engo.Point, spriteSheet *common.Spritesheet) *Animation {
-	entity := &Animation{BasicEntity: ecs.NewBasic()}
+func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spritesheet) *Hero {
+	hero := &Hero{BasicEntity: ecs.NewBasic()}
 
-	entity.SpaceComponent = common.SpaceComponent{
+	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
 		Width:    float32(width),
 		Height:   float32(height),
 	}
-	entity.RenderComponent = common.RenderComponent{
+	hero.RenderComponent = common.RenderComponent{
 		Drawable: spriteSheet.Cell(0),
 		Scale:    engo.Point{1, 1},
 	}
-	entity.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
+	hero.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
 
-	entity.AnimationComponent.AddAnimations(actions)
-	entity.AnimationComponent.SelectAnimationByName("downstop")
-	// entity.AnimationComponent.AddDefaultAnimation(StopDownAction)
+	hero.AnimationComponent.AddAnimations(actions)
+	hero.AnimationComponent.SelectAnimationByName("downstop")
 
-	return entity
+	return hero
 }
 
 type controlEntity struct {
@@ -195,6 +309,7 @@ func (c *ControlSystem) Remove(basic ecs.BasicEntity) {
 func (c *ControlSystem) Update(dt float32) {
 	for _, e := range c.entities {
 
+		// Add Character Movement Control
 		if engo.Input.Button(upButton).JustPressed() {
 			e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
 		} else if engo.Input.Button(downButton).JustPressed() {
@@ -215,7 +330,7 @@ func (c *ControlSystem) Update(dt float32) {
 			e.AnimationComponent.SelectAnimationByAction(StopRightAction)
 		}
 
-		speed := engo.GameWidth()*dt - 15
+		speed := engo.GameWidth() * dt
 
 		vert := engo.Input.Axis(e.ControlComponent.SchemeVert)
 		e.SpaceComponent.Position.Y += speed * vert.Value()
@@ -223,26 +338,28 @@ func (c *ControlSystem) Update(dt float32) {
 		horiz := engo.Input.Axis(e.ControlComponent.SchemeHoriz)
 		e.SpaceComponent.Position.X += speed * horiz.Value()
 
-		if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
-			e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
-		} else if e.SpaceComponent.Position.Y < 0 {
+		// Add Game Border Limits
+		var heightLimit float32 = levelHeight - e.SpaceComponent.Height
+		if e.SpaceComponent.Position.Y < 0 {
 			e.SpaceComponent.Position.Y = 0
+		} else if e.SpaceComponent.Position.Y > heightLimit {
+			e.SpaceComponent.Position.Y = heightLimit
 		}
 
-		if (e.SpaceComponent.Width + e.SpaceComponent.Position.X) > engo.GameWidth() {
-			e.SpaceComponent.Position.X = engo.GameWidth() - e.SpaceComponent.Width
-		} else if e.SpaceComponent.Position.X < 0 {
+		var widthLimit float32 = levelWidth - e.SpaceComponent.Width
+		if e.SpaceComponent.Position.X < 0 {
 			e.SpaceComponent.Position.X = 0
+		} else if e.SpaceComponent.Position.X > widthLimit {
+			e.SpaceComponent.Position.X = widthLimit
 		}
-
 	}
 }
 
 func main() {
 	opts := engo.RunOptions{
 		Title:  "Ivo",
-		Width:  1024,
-		Height: 640,
+		Width:  500,
+		Height: 500,
 	}
 	engo.Run(opts, &DefaultScene{})
 }
