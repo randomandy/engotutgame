@@ -187,7 +187,10 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
-	hero := scene.CreateEntity(engo.Point{0, 0}, spriteSheet)
+	hero := scene.CreateEntity(
+		engo.Point{engo.CanvasWidth() / 2, engo.CanvasHeight() / 2},
+		spriteSheet,
+	)
 
 	hero.ControlComponent = ControlComponent{
 		SchemeHoriz: "horizontal",
