@@ -197,6 +197,8 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 		SchemeVert:  "vertical",
 	}
 
+	hero.RenderComponent.SetZIndex(1)
+
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
@@ -208,6 +210,12 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.ControlComponent, &hero.SpaceComponent)
 		}
 	}
+
+	// Add EntityScroller System
+	w.AddSystem(&common.EntityScroller{
+		SpaceComponent: &hero.SpaceComponent,
+		TrackingBounds: levelData.Bounds(),
+	})
 }
 
 func (*DefaultScene) Type() string { return "GameWorld" }
@@ -284,7 +292,7 @@ func (c *ControlSystem) Update(dt float32) {
 			e.AnimationComponent.SelectAnimationByAction(StopRightAction)
 		}
 
-		speed := engo.GameWidth()*dt - 10
+		speed := engo.GameWidth() * dt
 
 		vert := engo.Input.Axis(e.ControlComponent.SchemeVert)
 		e.SpaceComponent.Position.Y += speed * vert.Value()
@@ -310,8 +318,8 @@ func (c *ControlSystem) Update(dt float32) {
 func main() {
 	opts := engo.RunOptions{
 		Title:  "Ivo",
-		Width:  800,
-		Height: 800,
+		Width:  400,
+		Height: 400,
 	}
 	engo.Run(opts, &DefaultScene{})
 }
