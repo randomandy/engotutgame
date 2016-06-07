@@ -182,8 +182,15 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	}
 
 	// Setup character and movement
-	engo.Input.RegisterAxis("vertical", engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown})
-	engo.Input.RegisterAxis("horizontal", engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight})
+	engo.Input.RegisterAxis(
+		"vertical",
+		engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown},
+	)
+
+	engo.Input.RegisterAxis(
+		"horizontal",
+		engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight},
+	)
 
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
@@ -203,11 +210,26 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *common.RenderSystem:
-			sys.Add(&hero.BasicEntity, &hero.RenderComponent, &hero.SpaceComponent)
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.RenderComponent,
+				&hero.SpaceComponent,
+			)
+
 		case *common.AnimationSystem:
-			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.RenderComponent)
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.AnimationComponent,
+				&hero.RenderComponent,
+			)
+
 		case *ControlSystem:
-			sys.Add(&hero.BasicEntity, &hero.AnimationComponent, &hero.ControlComponent, &hero.SpaceComponent)
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.AnimationComponent,
+				&hero.ControlComponent,
+				&hero.SpaceComponent,
+			)
 		}
 	}
 
@@ -236,7 +258,6 @@ func (*DefaultScene) CreateEntity(point engo.Point, spriteSheet *common.Spritesh
 
 	entity.AnimationComponent.AddAnimations(actions)
 	entity.AnimationComponent.SelectAnimationByName("downstop")
-	// entity.AnimationComponent.AddDefaultAnimation(StopDownAction)
 
 	return entity
 }
@@ -272,6 +293,7 @@ func (c *ControlSystem) Remove(basic ecs.BasicEntity) {
 func (c *ControlSystem) Update(dt float32) {
 	for _, e := range c.entities {
 
+		// Add Character Movement Control
 		if engo.Input.Button(upButton).JustPressed() {
 			e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
 		} else if engo.Input.Button(downButton).JustPressed() {
@@ -300,6 +322,7 @@ func (c *ControlSystem) Update(dt float32) {
 		horiz := engo.Input.Axis(e.ControlComponent.SchemeHoriz)
 		e.SpaceComponent.Position.X += speed * horiz.Value()
 
+		// Add Game Border Limits
 		if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
 			e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
 		} else if e.SpaceComponent.Position.Y < 0 {
