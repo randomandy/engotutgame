@@ -48,6 +48,7 @@ type Tile struct {
 	ecs.BasicEntity
 	common.RenderComponent
 	common.SpaceComponent
+	common.CollisionComponent
 }
 
 func (*DefaultScene) Preload() {
@@ -161,11 +162,20 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 				Drawable: v,
 				Scale:    engo.Point{1, 1},
 			}
+
+			tile.RenderComponent.SetZIndex(2)
+
 			tile.SpaceComponent = common.SpaceComponent{
 				Position: v.Point,
 				Width:    0,
 				Height:   0,
 			}
+
+			tile.CollisionComponent = common.CollisionComponent{
+				Solid: true,
+				Main:  true,
+			}
+
 			tileComponents = append(tileComponents, tile)
 		}
 	}
@@ -323,17 +333,17 @@ func (c *ControlSystem) Update(dt float32) {
 		e.SpaceComponent.Position.X += speed * horiz.Value()
 
 		// Add Game Border Limits
-		if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
-			e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
-		} else if e.SpaceComponent.Position.Y < 0 {
-			e.SpaceComponent.Position.Y = 0
-		}
+		// if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
+		// 	e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
+		// } else if e.SpaceComponent.Position.Y < 0 {
+		// 	e.SpaceComponent.Position.Y = 0
+		// }
 
-		if (e.SpaceComponent.Width + e.SpaceComponent.Position.X) > engo.GameWidth() {
-			e.SpaceComponent.Position.X = engo.GameWidth() - e.SpaceComponent.Width
-		} else if e.SpaceComponent.Position.X < 0 {
-			e.SpaceComponent.Position.X = 0
-		}
+		// if (e.SpaceComponent.Width + e.SpaceComponent.Position.X) > engo.GameWidth() {
+		// 	e.SpaceComponent.Position.X = engo.GameWidth() - e.SpaceComponent.Width
+		// } else if e.SpaceComponent.Position.X < 0 {
+		// 	e.SpaceComponent.Position.X = 0
+		// }
 
 	}
 }
