@@ -139,14 +139,9 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	tmxResource := resource.(common.TMXResource)
 	levelData := tmxResource.Level
 
-	// levelWidth = math.Sqrt(float64(len(levelData.Tiles))) * float64(levelData.Height())
-	// levelHeight = math.Sqrt(float64(len(levelData.Tiles))) * float64(levelData.Height())
-
+	// Extract Map Size
 	levelWidth = levelData.Bounds().Max.X
 	levelHeight = levelData.Bounds().Max.Y
-
-	// levelWidth = levelData.Width()
-	// levelHeight = levelData.Height()
 
 	// Create render and space components for each of the tiles
 	tileComponents := make([]*Tile, 0)
@@ -363,8 +358,8 @@ func (c *ControlSystem) Update(dt float32) {
 func main() {
 	opts := engo.RunOptions{
 		Title:  "Ivo",
-		Width:  400,
-		Height: 400,
+		Width:  500,
+		Height: 500,
 	}
 	engo.Run(opts, &DefaultScene{})
 }
