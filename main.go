@@ -44,9 +44,21 @@ type ControlComponent struct {
 	SchemeHoriz string
 }
 
+type Tile struct {
+	ecs.BasicEntity
+	common.RenderComponent
+	common.SpaceComponent
+}
+
 func (*DefaultScene) Preload() {
 
+	// Load character model
 	engo.Files.Load(model)
+
+	// Load TileMap
+	if err := engo.Files.Load("example.tmx"); err != nil {
+		panic(err)
+	}
 
 	StopUpAction = &common.Animation{
 		Name:   "upstop",
@@ -116,6 +128,60 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(&ControlSystem{})
 
+	// Setup TileMap
+	resource, err := engo.Files.Resource("example.tmx")
+	if err != nil {
+		panic(err)
+	}
+	tmxResource := resource.(common.TMXResource)
+	levelData := tmxResource.Level
+
+	// Create render and space components for each of the tiles
+	tileComponents := make([]*Tile, 0)
+	for _, v := range levelData.Tiles {
+		if v.Image != nil {
+			tile := &Tile{BasicEntity: ecs.NewBasic()}
+			tile.RenderComponent = common.RenderComponent{
+				Drawable: v,
+				Scale:    engo.Point{1, 1},
+			}
+			tile.SpaceComponent = common.SpaceComponent{
+				Position: v.Point,
+				Width:    0,
+				Height:   0,
+			}
+			tileComponents = append(tileComponents, tile)
+		}
+	}
+	// Do the same the levels images
+	for _, v := range levelData.Images {
+		if v.Image != nil {
+			tile := &Tile{BasicEntity: ecs.NewBasic()}
+			tile.RenderComponent = common.RenderComponent{
+				Drawable: v,
+				Scale:    engo.Point{1, 1},
+			}
+			tile.SpaceComponent = common.SpaceComponent{
+				Position: v.Point,
+				Width:    0,
+				Height:   0,
+			}
+			tileComponents = append(tileComponents, tile)
+		}
+	}
+
+	// Add each of the tiles entities and its components to the render system
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *common.RenderSystem:
+			for _, v := range tileComponents {
+				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
+			}
+
+		}
+	}
+
+	// Setup character and movement
 	engo.Input.RegisterAxis("vertical", engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown})
 	engo.Input.RegisterAxis("horizontal", engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight})
 
@@ -215,7 +281,7 @@ func (c *ControlSystem) Update(dt float32) {
 			e.AnimationComponent.SelectAnimationByAction(StopRightAction)
 		}
 
-		speed := engo.GameWidth()*dt - 15
+		speed := engo.GameWidth()*dt - 10
 
 		vert := engo.Input.Axis(e.ControlComponent.SchemeVert)
 		e.SpaceComponent.Position.Y += speed * vert.Value()
@@ -241,8 +307,8 @@ func (c *ControlSystem) Update(dt float32) {
 func main() {
 	opts := engo.RunOptions{
 		Title:  "Ivo",
-		Width:  1024,
-		Height: 640,
+		Width:  800,
+		Height: 800,
 	}
 	engo.Run(opts, &DefaultScene{})
 }
