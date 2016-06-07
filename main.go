@@ -27,11 +27,13 @@ var (
 	model       = "motw.png"
 	width       = 52
 	height      = 73
+	levelWidth  float32
+	levelHeight float32
 )
 
 type DefaultScene struct{}
 
-type Animation struct {
+type Hero struct {
 	ecs.BasicEntity
 	common.AnimationComponent
 	common.RenderComponent
@@ -137,6 +139,15 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	tmxResource := resource.(common.TMXResource)
 	levelData := tmxResource.Level
 
+	// levelWidth = math.Sqrt(float64(len(levelData.Tiles))) * float64(levelData.Height())
+	// levelHeight = math.Sqrt(float64(len(levelData.Tiles))) * float64(levelData.Height())
+
+	levelWidth = levelData.Bounds().Max.X
+	levelHeight = levelData.Bounds().Max.Y
+
+	// levelWidth = levelData.Width()
+	// levelHeight = levelData.Height()
+
 	// Create render and space components for each of the tiles
 	tileComponents := make([]*Tile, 0)
 	for _, v := range levelData.Tiles {
@@ -204,7 +215,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
-	hero := scene.CreateEntity(
+	hero := scene.CreateHero(
 		engo.Point{engo.CanvasWidth() / 2, engo.CanvasHeight() / 2},
 		spriteSheet,
 	)
@@ -252,24 +263,24 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 
 func (*DefaultScene) Type() string { return "GameWorld" }
 
-func (*DefaultScene) CreateEntity(point engo.Point, spriteSheet *common.Spritesheet) *Animation {
-	entity := &Animation{BasicEntity: ecs.NewBasic()}
+func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spritesheet) *Hero {
+	hero := &Hero{BasicEntity: ecs.NewBasic()}
 
-	entity.SpaceComponent = common.SpaceComponent{
+	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
 		Width:    float32(width),
 		Height:   float32(height),
 	}
-	entity.RenderComponent = common.RenderComponent{
+	hero.RenderComponent = common.RenderComponent{
 		Drawable: spriteSheet.Cell(0),
 		Scale:    engo.Point{1, 1},
 	}
-	entity.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
+	hero.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
 
-	entity.AnimationComponent.AddAnimations(actions)
-	entity.AnimationComponent.SelectAnimationByName("downstop")
+	hero.AnimationComponent.AddAnimations(actions)
+	hero.AnimationComponent.SelectAnimationByName("downstop")
 
-	return entity
+	return hero
 }
 
 type controlEntity struct {
@@ -333,18 +344,19 @@ func (c *ControlSystem) Update(dt float32) {
 		e.SpaceComponent.Position.X += speed * horiz.Value()
 
 		// Add Game Border Limits
-		// if (e.SpaceComponent.Height + e.SpaceComponent.Position.Y) > engo.GameHeight() {
-		// 	e.SpaceComponent.Position.Y = engo.GameHeight() - e.SpaceComponent.Height
-		// } else if e.SpaceComponent.Position.Y < 0 {
-		// 	e.SpaceComponent.Position.Y = 0
-		// }
+		var heightLimit float32 = levelHeight - e.SpaceComponent.Height
+		if e.SpaceComponent.Position.Y < 0 {
+			e.SpaceComponent.Position.Y = 0
+		} else if e.SpaceComponent.Position.Y > heightLimit {
+			e.SpaceComponent.Position.Y = heightLimit
+		}
 
-		// if (e.SpaceComponent.Width + e.SpaceComponent.Position.X) > engo.GameWidth() {
-		// 	e.SpaceComponent.Position.X = engo.GameWidth() - e.SpaceComponent.Width
-		// } else if e.SpaceComponent.Position.X < 0 {
-		// 	e.SpaceComponent.Position.X = 0
-		// }
-
+		var widthLimit float32 = levelWidth - e.SpaceComponent.Width
+		if e.SpaceComponent.Position.X < 0 {
+			e.SpaceComponent.Position.X = 0
+		} else if e.SpaceComponent.Position.X > widthLimit {
+			e.SpaceComponent.Position.X = widthLimit
+		}
 	}
 }
 
