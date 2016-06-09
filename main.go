@@ -39,6 +39,7 @@ type Hero struct {
 	common.RenderComponent
 	common.SpaceComponent
 	ControlComponent
+	common.CollisionComponent
 }
 
 type ControlComponent struct {
@@ -128,6 +129,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	common.SetBackground(color.White)
 
 	w.AddSystem(&common.RenderSystem{})
+	w.AddSystem(&common.CollisionSystem{})
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(&ControlSystem{})
 
@@ -169,7 +171,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 				Scale:    engo.Point{1, 1},
 			}
 
-			tile.RenderComponent.SetZIndex(2)
+			// tile.RenderComponent.SetZIndex(2)
 
 			tile.SpaceComponent = common.SpaceComponent{
 				Position: v.Point,
@@ -179,7 +181,6 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 
 			tile.CollisionComponent = common.CollisionComponent{
 				Solid: true,
-				Main:  true,
 			}
 
 			tileComponents = append(tileComponents, tile)
@@ -194,6 +195,14 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
 			}
 
+		case *common.CollisionSystem:
+			for _, v := range tileComponents {
+				sys.Add(
+					&v.BasicEntity,
+					&v.CollisionComponent,
+					&v.SpaceComponent,
+				)
+			}
 		}
 	}
 
@@ -220,7 +229,12 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 		SchemeVert:  "vertical",
 	}
 
-	hero.RenderComponent.SetZIndex(1)
+	hero.CollisionComponent = common.CollisionComponent{
+		Solid: true,
+		Main:  true,
+	}
+
+	// hero.RenderComponent.SetZIndex(1)
 
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
@@ -246,6 +260,14 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 				&hero.ControlComponent,
 				&hero.SpaceComponent,
 			)
+
+		case *common.CollisionSystem:
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.CollisionComponent,
+				&hero.SpaceComponent,
+			)
+
 		}
 	}
 
