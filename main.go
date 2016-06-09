@@ -2,7 +2,7 @@ package main
 
 import (
 	"engo.io/engo"
-	"github.com/randomandy/ivo/scenes"
+	"github.com/randomandy/ivo/scene"
 )
 
 func main() {
@@ -11,5 +11,5 @@ func main() {
 		Width:  500,
 		Height: 500,
 	}
-	engo.Run(opts, &scenes.MenuScene{})
+	engo.Run(opts, &scene.MenuScene{})
 }
