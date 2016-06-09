@@ -90,7 +90,7 @@ func (s *SceneSwitcherSystem) Update(dt float32) {
 		s.secondsWaited = 0
 
 		// Change the world to s.NextScene, and don't override / force World re-creation
-		engo.SetSceneByName(s.NextScene, true)
+		engo.SetScene(&DefaultScene{}, false)
 
 		log.Println("Switched to", s.NextScene)
 	}
