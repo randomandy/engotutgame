@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="grass" tilewidth="32" tileheight="32" tilecount="72" columns="12">
+  <image source="grass-tiles-2-small.png" trans="ff00ff" width="384" height="192"/>
+ </tileset>
+ <tileset firstgid="73" name="tree2-final" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+  <image source="tree2-final.png" trans="ff00ff" width="256" height="256"/>
+ </tileset>
+ <layer name="dirt" width="25" height="25">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgF5AB2IOYAYk4g5qKRHcJALALEokAsRiM76OGP4WIHPeJjFIyCUTAKRsEoIBYAAM8UAS0=
+  </data>
+ </layer>
+ <layer name="grass" width="25" height="25">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFlABDIDYCYmMgNqGRHbZAbAfE9kDsQCM7Rv1BPKCHP0bBKBgFo2AUjAJCAAC+pQVN
+  </data>
+ </layer>
+</map>

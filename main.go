@@ -8,8 +8,8 @@ import (
 func main() {
 	opts := engo.RunOptions{
 		Title:  "Ivo",
-		Width:  500,
-		Height: 500,
+		Width:  800,
+		Height: 800,
 	}
-	engo.Run(opts, &scene.MenuScene{})
+	engo.Run(opts, &scene.DefaultScene{})
 }

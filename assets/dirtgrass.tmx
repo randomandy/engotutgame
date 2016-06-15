@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="64" tileheight="64" nextobjectid="1">
+ <tileset firstgid="1" name="tilesheet_complete" tilewidth="64" tileheight="64" tilecount="540" columns="27">
+  <image source="../../../../../../../coding/gameart/tilesets/kenney/topdown-shooter/Tilesheet/tilesheet_complete.png" width="1728" height="1280"/>
+ </tileset>
+ <layer name="dirt" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJydlEFu5EAQw/KDyf9fm8seFgOLZPlgJGO3u1US5d+fn5/Pv+v363q6//l69vlaV56ve3b2uta6pev7nSetpIme13nIb/JsnUPaymxL13WvwsWFr/VuYYn2JyYs36JvefOGt8IfdaX0qO63ZrVMrIOFf9NqPaH3qg/EZ11/ybK8vzxcGZNGYmPtSWstq8u8T/drfk+a1j3KoXBKna49KNotB+ty8fYpW9uLZqe8qt9PmstV/CrnVN+q3uJ34dh4so5eZjY2zKuVb8nH5rp4SGsv/FTGn2ahv1XHyt46ZmdTFy3P0q01q3XbmCAfLIviV+HA9FKWpKHySu9ZnuZn6UXpp/XPfCb+iEFibq2n3pFO64uxYFrNy8KkZUyaiUnaj/QWz1fulHfxqZxT+abcL9+H8s2oXVq+Fu9L767sGEfEeslu6SF9dg71yvgs3wPy2ngkb0s+ddaSi2kq/STWr88L2xcOaH7rbM175Wb67FtDOdj5ppf2uX4Xyu+389K+1/Vrduquabt0oXhorFpuJSPqNc1J79LstQvm+9s5bUZjZZ37JivioTBhHJhuY906Qp2t5xm35htpetM58+Pigc1rvNi567mxZBlcWCQmi26b9ZLN0mZcWt70/2Ky8mndurB28ds6YjNf2L6wWfW95WP5ZOtqR82/slf12fpdukD5kQeUB821ele4XTOWfK/fhMKGeVzmK/Nc+1P6QpnVfhsvxvalx0WL9Wt5XZlZF/l12cO6R/269Ia6XzmrfJgXl3wqY8XXujfN+2Yt9dp6Zkyt5yuHwgPlQpyZn8b5uv5/7w/WOJd/
+  </data>
+ </layer>
+ <layer name="grass" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztmEsOwzAIRHP63qjtNdobJV1EspCNATMYq35SN01CzDD4k+PYrMBj9gCSwuki1SxK25Vq+Lx+L4d7ZvO5fl+HeyJyfYPj/5DkekPHo9Ugqz84DWo9qtHsRlvL2v3R+qF63qLfCF49H0lZf491YsQ76HlIk1+tTvT5ldZVBLVar6iJpicl/qY+rmlC/4tYg0u4nFHzvzWu9TnUXGuNixpP1v0Oh2W/g55buPjo/ozuf4uWo/tyLtZovBGkfSnVrBePy7N1LdofErg8vTVdFVTdJHF72tLr1v6T5hjV3+gzVrYz3Cys3m75QOuPnr/LeJp5RjqOlg88/FGO17pX135vmkm2nlpxT12jpSvNT+IHRA+N4uWb1lxG43utmdmI6r8s+1huHCNz4z/4IaKGljNS1Ps1eJyRUO/f+OHhF803EWsP9p7L9s0UQZY1aLO5OQFZ846+
+  </data>
+ </layer>
+</map>

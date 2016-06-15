@@ -2,6 +2,7 @@ package scene
 
 import (
 	"image/color"
+	"log"
 
 	"engo.io/ecs"
 	"engo.io/engo"
@@ -59,7 +60,7 @@ func (*DefaultScene) Preload() {
 	engo.Files.Load(model)
 
 	// Load TileMap
-	if err := engo.Files.Load("example.tmx"); err != nil {
+	if err := engo.Files.Load("dirtgrass.tmx"); err != nil {
 		panic(err)
 	}
 
@@ -132,7 +133,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	w.AddSystem(&ControlSystem{})
 
 	// Setup TileMap
-	resource, err := engo.Files.Resource("example.tmx")
+	resource, err := engo.Files.Resource("dirtgrass.tmx")
 	if err != nil {
 		panic(err)
 	}
@@ -143,71 +144,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 	levelWidth = levelData.Bounds().Max.X
 	levelHeight = levelData.Bounds().Max.Y
 
-	// Create render and space components for each of the tiles
-	tileComponents := make([]*Tile, 0)
-	for _, v := range levelData.Tiles {
-		if v.Image != nil {
-			tile := &Tile{BasicEntity: ecs.NewBasic()}
-			tile.RenderComponent = common.RenderComponent{
-				Drawable: v,
-				Scale:    engo.Point{1, 1},
-			}
-			tile.SpaceComponent = common.SpaceComponent{
-				Position: v.Point,
-				Width:    0,
-				Height:   0,
-			}
-			tileComponents = append(tileComponents, tile)
-		}
-	}
-	// Do the same the levels images
-	for _, v := range levelData.Images {
-		if v.Image != nil {
-			tile := &Tile{BasicEntity: ecs.NewBasic()}
-			tile.RenderComponent = common.RenderComponent{
-				Drawable: v,
-				Scale:    engo.Point{1, 1},
-			}
-
-			tile.RenderComponent.SetZIndex(2)
-
-			tile.SpaceComponent = common.SpaceComponent{
-				Position: v.Point,
-				Width:    0,
-				Height:   0,
-			}
-
-			tile.CollisionComponent = common.CollisionComponent{
-				Solid: true,
-				Main:  true,
-			}
-
-			tileComponents = append(tileComponents, tile)
-		}
-	}
-
-	// Add each of the tiles entities and its components to the render system
-	for _, system := range w.Systems() {
-		switch sys := system.(type) {
-		case *common.RenderSystem:
-			for _, v := range tileComponents {
-				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
-			}
-
-		}
-	}
-
-	// Setup character and movement
-	engo.Input.RegisterAxis(
-		"vertical",
-		engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown},
-	)
-
-	engo.Input.RegisterAxis(
-		"horizontal",
-		engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight},
-	)
-
+	// Create Hero
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
 
 	hero := scene.CreateHero(
@@ -220,7 +157,7 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 		SchemeVert:  "vertical",
 	}
 
-	hero.RenderComponent.SetZIndex(1)
+	hero.RenderComponent.SetZIndex(2)
 
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
@@ -248,6 +185,103 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 			)
 		}
 	}
+
+	// Create render and space components for each of the tiles
+	tileComponents := make([]*Tile, 0)
+
+	for _, tileLayer := range levelData.TileLayers {
+
+		log.Println("Now processing layer: " + tileLayer.Name)
+
+		for _, tileElement := range tileLayer.Tiles {
+
+			if tileElement.Image != nil {
+
+				log.Println("Adding Tile")
+
+				tile := &Tile{BasicEntity: ecs.NewBasic()}
+				tile.RenderComponent = common.RenderComponent{
+					Drawable: tileElement,
+					Scale:    engo.Point{1, 1},
+				}
+				tile.SpaceComponent = common.SpaceComponent{
+					Position: tileElement.Point,
+					Width:    0,
+					Height:   0,
+				}
+
+				if tileLayer.Name == "dirt" {
+					tile.RenderComponent.SetZIndex(0)
+				}
+
+				if tileLayer.Name == "grass" {
+					tile.RenderComponent.SetZIndex(1)
+				}
+
+				tileComponents = append(tileComponents, tile)
+			}
+		}
+	}
+
+	for _, imageLayer := range levelData.ImageLayers {
+		for _, imageElement := range imageLayer.Images {
+
+			if imageElement.Image != nil {
+				tile := &Tile{BasicEntity: ecs.NewBasic()}
+				tile.RenderComponent = common.RenderComponent{
+					Drawable: imageElement,
+					Scale:    engo.Point{1, 1},
+				}
+				tile.SpaceComponent = common.SpaceComponent{
+					Position: imageElement.Point,
+					Width:    0,
+					Height:   0,
+				}
+
+				if imageLayer.Name == "clouds" {
+					tile.RenderComponent.SetZIndex(5)
+				}
+
+				tileComponents = append(tileComponents, tile)
+			}
+		}
+	}
+
+	// Add each of the tiles entities and its components to the render system
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *common.RenderSystem:
+			for _, v := range tileComponents {
+				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
+			}
+
+		}
+	}
+
+	// Access Object Layers
+	for _, objectLayer := range levelData.ObjectLayers {
+		log.Println("This object layer is called " + objectLayer.Name)
+		// Do something with every regular Object
+		for _, object := range objectLayer.Objects {
+			log.Println("This object is called " + object.Name)
+		}
+
+		// Do something with every polyline Object
+		for _, polylineObject := range objectLayer.PolyObjects {
+			log.Println("This object is called " + polylineObject.Name)
+		}
+	}
+
+	// Setup character and movement
+	engo.Input.RegisterAxis(
+		"vertical",
+		engo.AxisKeyPair{engo.ArrowUp, engo.ArrowDown},
+	)
+
+	engo.Input.RegisterAxis(
+		"horizontal",
+		engo.AxisKeyPair{engo.ArrowLeft, engo.ArrowRight},
+	)
 
 	// Add EntityScroller System
 	w.AddSystem(&common.EntityScroller{

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="isometric" renderorder="right-down" width="10" height="10" tilewidth="256" tileheight="128" nextobjectid="1">
+ <tileset firstgid="1" name="TilesetPack 5 - Grass and Dirt" tilewidth="256" tileheight="158" tilecount="49" columns="7">
+  <image source="../../../../../../../coding/gameart/tilesets/paid/Isometric Tiletset 5/Tileset Pack 5 - PNG Sources/TilesetPack 5 - Grass and Dirt.png" width="1792" height="1106"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYBzFgwYDAFB4AGU=
+  </data>
+ </layer>
+</map>
