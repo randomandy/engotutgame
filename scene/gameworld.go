@@ -218,6 +218,10 @@ func (scene *DefaultScene) Setup(w *ecs.World) {
 					tile.RenderComponent.SetZIndex(1)
 				}
 
+				if tileLayer.Name == "house" {
+					tile.RenderComponent.SetZIndex(2)
+				}
+
 				tileComponents = append(tileComponents, tile)
 			}
 		}

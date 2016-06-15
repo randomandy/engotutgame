@@ -10,7 +10,17 @@
  </layer>
  <layer name="grass" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztmEsOwzAIRHP63qjtNdobJV1EspCNATMYq35SN01CzDD4k+PYrMBj9gCSwuki1SxK25Vq+Lx+L4d7ZvO5fl+HeyJyfYPj/5DkekPHo9Ugqz84DWo9qtHsRlvL2v3R+qF63qLfCF49H0lZf491YsQ76HlIk1+tTvT5ldZVBLVar6iJpicl/qY+rmlC/4tYg0u4nFHzvzWu9TnUXGuNixpP1v0Oh2W/g55buPjo/ozuf4uWo/tyLtZovBGkfSnVrBePy7N1LdofErg8vTVdFVTdJHF72tLr1v6T5hjV3+gzVrYz3Cys3m75QOuPnr/LeJp5RjqOlg88/FGO17pX135vmkm2nlpxT12jpSvNT+IHRA+N4uWb1lxG43utmdmI6r8s+1huHCNz4z/4IaKGljNS1Ps1eJyRUO/f+OHhF803EWsP9p7L9s0UQZY1aLO5OQFZ846+
+   eJztWW1uwzAI9YXXbZeothxl/7dcY73Rkh+oCAEGjD/U9UlWq8bBfvjxkbSUcdgGrtUTM3hcO9h8hPM4/SLxsPqsh28j66x0Ht/H+AnOWYnH7zFuwTmYh8UfrdiP8XKMV2ZcGuxiHhZ/4P1geHywCfNbtJGlK80HNEY3YX5tL9R3tXu5+Zmak/br1TieYz0Pj+ZqsPDwxvyMfEXX3NHv0XqUla807WprWn4/gflx+e693PMdd5bUPxn1O8Ij8/4WcDEJPgH/fhW+rtDxKawxgocWkxv5tOib6pjrFal2PNq3oMZDy1Uax5bz0OxquuB0ZtmHxrGFR7SucDqDT6n/qvVgUr8zCpSH5ld8zdrvYPR8XoL6J/HYyVzNTgRZ8W89j5PrR7lr7K3U83FLX16zRe15dIUR8b81nq360+IcxyuN+Qu6pulvBjgewJOrNdI1ilHvQMDXoGtOV1LN5K5Z0auug12IYdxnAccruYd+p76PxrOVo+UZzppbtXmZz301+xEeOO9Kfe9o4D1Z+vITUW1LOvPqr5Y7sD1PnrHuQ9JZhv7wfqO9uud902z0jlkvZvbUmZD8SvlZ9NAjhlqRpRspl1H7WTVzNYyKv9l9LEDbR0tu/A96GHGGmh9H+DhrDc2PI2Jutbr6qMjQi+e/uGgM1u7rpZeVdLhKDXriCcAfQfjfIg==
+  </data>
+ </layer>
+ <layer name="house" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztz9EJgDAUA8DXGQQ7h26hc9j9VzA7qKhwByG/SRUAAAA8Y25VR9Lb20uu2bJ/Su9+fMKS/SNZf/4DAAAAAID7ncT4ArA=
+  </data>
+ </layer>
+ <layer name="door" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztzjERAAAIBKC3fyXD2cBzc4EEJAAAAMBF1/cAAAAAAADYDLmqAL4=
   </data>
  </layer>
 </map>
