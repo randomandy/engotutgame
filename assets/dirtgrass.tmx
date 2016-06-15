@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="64" tileheight="64" nextobjectid="1">
+ <tileset firstgid="1" name="tilesheet_complete" tilewidth="64" tileheight="64" tilecount="540" columns="27">
+  <image source="../../../../../../../coding/gameart/tilesets/kenney/topdown-shooter/Tilesheet/tilesheet_complete.png" width="1728" height="1280"/>
+ </tileset>
+ <layer name="dirt" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJydlEFu5EAQw/KDyf9fm8seFgOLZPlgJGO3u1US5d+fn5/Pv+v363q6//l69vlaV56ve3b2uta6pev7nSetpIme13nIb/JsnUPaymxL13WvwsWFr/VuYYn2JyYs36JvefOGt8IfdaX0qO63ZrVMrIOFf9NqPaH3qg/EZ11/ybK8vzxcGZNGYmPtSWstq8u8T/drfk+a1j3KoXBKna49KNotB+ty8fYpW9uLZqe8qt9PmstV/CrnVN+q3uJ34dh4so5eZjY2zKuVb8nH5rp4SGsv/FTGn2ahv1XHyt46ZmdTFy3P0q01q3XbmCAfLIviV+HA9FKWpKHySu9ZnuZn6UXpp/XPfCb+iEFibq2n3pFO64uxYFrNy8KkZUyaiUnaj/QWz1fulHfxqZxT+abcL9+H8s2oXVq+Fu9L767sGEfEeslu6SF9dg71yvgs3wPy2ngkb0s+ddaSi2kq/STWr88L2xcOaH7rbM175Wb67FtDOdj5ppf2uX4Xyu+389K+1/Vrduquabt0oXhorFpuJSPqNc1J79LstQvm+9s5bUZjZZ37JivioTBhHJhuY906Qp2t5xm35htpetM58+Pigc1rvNi567mxZBlcWCQmi26b9ZLN0mZcWt70/2Ky8mndurB28ds6YjNf2L6wWfW95WP5ZOtqR82/slf12fpdukD5kQeUB821ele4XTOWfK/fhMKGeVzmK/Nc+1P6QpnVfhsvxvalx0WL9Wt5XZlZF/l12cO6R/269Ia6XzmrfJgXl3wqY8XXujfN+2Yt9dp6Zkyt5yuHwgPlQpyZn8b5uv5/7w/WOJd/
+  </data>
+ </layer>
+ <layer name="grass" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztWW1OwzAMzYUZcIkJKk7Cf+g14Ea0P6xZlu3YjvOhsSdFm9bUyXOeP9qVMg7bwLV6YgaPaweb93Aep18kHlaf9fBtZJ2VzuPrGN/BOSvx+DnGb3AO5mHxRyv2Yzwd45kZlwa7mIfFH3g/GB4fbML8Fm1k6UrzAY3RTZhf2wv1Xe1ebn6m5qT9ejWO51jPw6O5Giw8vDE/I1/RNXf0e7QeZeUrTbvampbfT2B+XL57Lbd8x50l9U9G/Y7wyLy/BVxMgk/Av5+Fryt0vAtrjOChxeRGPi36pjrmekWqHY/2Lajx0HKVxrHlPDS7mi44nVn2oXFs4RGtK5zO4FPqv2o92EcZ0yNKoDw0v+Jr1n4Ho+fzEtQ/icdO5mp2IsiKf+t5nFzfyk1jL6Wej1v68potas+jK4yI/63xbNWfFuf4+YTG/AVd0/Q3AxwP4MnVGukaxah3IOBr0DWnK6lmctes6FXXwS7EMO6zgOOV3EO/U99H49nK0fIMZ82t2rzM576a/QgPnHelvnc08J4sffmJqLYlnXn1V8sd2J4nz1j3IeksQ394v9Fe3fO+aTZ6x6wXM3vqTEh+pfwseugRQ63I0o2Uy6j9rJq5GkbF3+w+FqDtoyU3/gc9jDhDzY8jfJy1hubHETG3Wl29V2ToxfNfXDQGa/f10stKOlylBj3wAOAPcYjfJA==
+  </data>
+ </layer>
+ <layer name="house" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztz9EJgDAUA8DXGQQ7h26hc9j9VzA7qKhwByG/SRUAAAA8Y25VR9Lb20uu2bJ/Su9+fMKS/SNZf/4DAAAAAID7ncT4ArA=
+  </data>
+ </layer>
+ <layer name="door" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztzjERAAAIBKC3fyXD2cBzc4EEJAAAAMBF1/cAAAAAAADYDLmqAL4=
+  </data>
+ </layer>
+</map>
